@@ -1,4 +1,6 @@
 import React, {useState} from 'react';
+import {Button, Col, Container, Form, Row} from 'react-bootstrap';
+import {Link} from "react-router-dom";
 
 const LoginPage = () => {
   const [username, setUsername] = useState<string>('');
@@ -6,50 +8,49 @@ const LoginPage = () => {
 
   const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('Login attempt:', {username, password});
     alert('Login successful!');
   };
 
   return (
-    <div className="container">
+    <Container>
       <h1 className="text-center my-5">街口登入</h1>
-      <div className="row justify-content-center">
-        <div className="col-md-4">
-          <form onSubmit={handleLogin}>
-            <div className="mb-3">
-              <label htmlFor="username" className="form-label">使用者名稱</label>
-              <input
+      <Row className="justify-content-center">
+        <Col md={4}>
+          <Form onSubmit={handleLogin}>
+            <Form.Group className="mb-3" controlId="username">
+              <Form.Label>使用者名稱</Form.Label>
+              <Form.Control
                 type="text"
-                className="form-control"
-                id="username"
                 placeholder="輸入使用者名稱"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
               />
-            </div>
-            <div className="mb-3">
-              <label htmlFor="password" className="form-label">密碼</label>
-              <input
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="password">
+              <Form.Label>密碼</Form.Label>
+              <Form.Control
                 type="password"
-                className="form-control"
-                id="password"
                 placeholder="輸入密碼"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
-            </div>
+            </Form.Group>
             <div className="d-grid gap-2">
-              <button type="submit" className="btn btn-primary">登入</button>
+              <Button type="submit" variant="primary">
+                登入
+              </Button>
             </div>
             <div className="text-center mt-3">
-              <a href="#" className="btn btn-link">註冊</a>
+              <Link to="/register">
+                <Button variant="link">註冊</Button>
+              </Link>
             </div>
-          </form>
-        </div>
-      </div>
-    </div>
+          </Form>
+        </Col>
+      </Row>
+    </Container>
   );
 };
 
