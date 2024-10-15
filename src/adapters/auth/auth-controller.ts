@@ -3,22 +3,30 @@ import OauthClientRepository from "../../application/auth/oauth-client-repositor
 
 export default class AuthController {
 
-  constructor(private repo: OauthClientRepository) {
+  constructor(
+    private repo: OauthClientRepository,
+  ) {
   }
 
   registerRoutes(app: FastifyInstance) {
     app.get<{
-      Querystring: { client_id: string, redirect_uri: string }
+      Querystring: { client_id: string, redirect_uri: string },
+      Headers: { host: string }
     }>('/authorize', (request, reply) => {
       const {client_id, redirect_uri} = request.query;
       const client = this.repo.findById(client_id) ?? null;
 
-      if (!client) {
+      if (!client)
         return reply.code(400).send({error: 'invalid_client'});
-      }
+
+      // if (!client.allowOrigins.includes(request.headers.host))
+      //   return reply.code(400).send({error: 'invalid_origin'});
+
+      if (!client.redirectUris.includes(redirect_uri))
+        return reply.code(400).send({error: 'invalid_redirect_uri'});
 
 
-      reply.send('Authorize view');
+      reply.code(200).sendFile('login.html');
     });
 
     // app.post<{
