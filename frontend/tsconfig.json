@@ -6,11 +6,24 @@
     },
     {
       "path": "./tsconfig.node.json"
+    },
+    {
+      "path": "../shared",
+      "prepend": true
     }
   ],
   "compilerOptions": {
     "jsx": "react-jsx",
     "allowImportingTsExtensions": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "baseUrl": "./",
+    "paths": {
+      "@src/*": [
+        "src/*"
+      ],
+      "@shared/*": [
+        "../shared/src/*"
+      ]
+    }
   }
 }

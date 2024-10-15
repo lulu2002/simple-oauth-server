@@ -9,6 +9,7 @@ function App() {
 
   const queryParams = new QueryParamsImpl();
 
+
   return (
     <>
       <Router>

@@ -1,6 +1,7 @@
 import axios from "axios";
 import QueryParams from "../../application/QueryParams.ts";
 import AuthClientCheckResult from "./AuthClientCheckResult.ts";
+import {AuthServerValidateResponse} from "@shared/auth-server-validate-response.ts"
 
 export default class LoginPageViewModel {
 
@@ -18,7 +19,7 @@ export default class LoginPageViewModel {
       return {reason: 'redirect_uri is not present', success: false};
 
     try {
-      const response = await axios.get('/api/authorize', {
+      const response = await axios.get<AuthServerValidateResponse>('/api/authorize', {
         params: {
           client_id: clientId,
           redirect_uri: redirectUri

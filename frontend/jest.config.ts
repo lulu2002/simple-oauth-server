@@ -4,6 +4,10 @@ module.exports = {
   transform: {
     ".(ts|tsx)": "ts-jest"
   },
+  moduleNameMapper: {
+    '^@src/(.*)$': '<rootDir>/src/$1',
+    '^@shared/(.*)$': '<rootDir>../shared/src/$1',
+  },
   coveragePathIgnorePatterns: [
     "/node_modules/",
     "/coverage",
