@@ -11,7 +11,10 @@ const fastifyInstance = fastify();
 fastifyInstance.register(fastifyFormbody);
 fastifyInstance.register(fastifyCookie);
 fastifyInstance.register(fastifyCors, {origin: true});
-fastifyInstance.register(fastifyStatic, {root: path.join(__dirname, '..', 'public')});
+fastifyInstance.register(fastifyStatic, {
+  root: path.join(__dirname, '../../frontend/dist'),
+  prefix: '/'
+});
 
 const repo = new OauthClientRepositoryInMemory();
 const controller = new AuthController(repo);
