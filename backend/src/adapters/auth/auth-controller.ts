@@ -12,7 +12,7 @@ export default class AuthController {
     app.get<{
       Querystring: { client_id: string, redirect_uri: string },
       Headers: { host: string }
-    }>('/authorize', (request, reply) => {
+    }>('/api/authorize', (request, reply) => {
       const {client_id, redirect_uri} = request.query;
       const client = this.repo.findById(client_id) ?? null;
 
