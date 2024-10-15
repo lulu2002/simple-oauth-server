@@ -1,4 +1,9 @@
 {
+  "references": [
+    {
+      "path": "../shared"
+    }
+  ],
   "compilerOptions": {
     "target": "ESNext",
     "module": "commonjs",
@@ -25,6 +30,9 @@
       ],
       "@domain/*": [
         "src/domain/*"
+      ],
+      "@shared/*": [
+        "../shared/src/*"
       ]
     }
   },

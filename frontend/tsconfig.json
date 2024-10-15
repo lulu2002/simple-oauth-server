@@ -8,8 +8,7 @@
       "path": "./tsconfig.node.json"
     },
     {
-      "path": "../shared",
-      "prepend": true
+      "path": "../shared"
     }
   ],
   "compilerOptions": {

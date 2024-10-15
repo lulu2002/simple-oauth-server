@@ -1,7 +1,8 @@
 import axios from "axios";
 import QueryParams from "../../application/QueryParams.ts";
 import AuthClientCheckResult from "./AuthClientCheckResult.ts";
-import {AuthServerValidateResponse} from "@shared/auth-server-validate-response.ts"
+import {AuthServerValidateResponse} from "@shared/auth-server-validate.ts"
+import {AuthServerLoginRequest, AuthServerLoginResponse} from "@shared/auth-server-login.ts"
 
 export default class LoginPageViewModel {
 
@@ -32,7 +33,39 @@ export default class LoginPageViewModel {
     }
   }
 
-  async handleLogin(username: string, password: string) {
-    alert("YOYO " + username + " " + password);
+  async login(username: string, password: string): Promise<AuthLoginResult> {
+    const clientId = this.queryParams.get('client_id');
+    const redirectUri = this.queryParams.get('redirect_uri');
+
+    if (!clientId)
+      return {success: false, message: 'client_id is not present', token: ''};
+
+    if (!redirectUri)
+      return {success: false, message: 'redirect_uri is not present', token: ''};
+
+    try {
+      const body: AuthServerLoginRequest = {
+        username: username,
+        password: password,
+        client_id: clientId,
+        redirect_uri: redirectUri
+      };
+      const data: AuthServerLoginResponse = (await axios.post<AuthServerLoginResponse>('/api/login', body)).data;
+      return {success: data.success, message: data.message, token: data.token};
+    } catch (error) {
+      console.error('Failed to login:', error);
+      return {success: false, message: 'failed to login', token: ''};
+    }
   }
+
+  closeWithCode(code: string) {
+    window.opener.postMessage({type: 'oauth-success', token: code}, window.location.origin);
+    window.close();
+  }
+}
+
+export interface AuthLoginResult {
+  success: boolean;
+  message: string;
+  token: string;
 }

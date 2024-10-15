@@ -19,11 +19,19 @@ fastifyInstance.register(fastifyStatic, {
 const repo = new OauthClientRepositoryInMemory();
 const controller = new AuthController(repo);
 
-
 controller.registerRoutes(fastifyInstance);
 
 repo.add({
   allowOrigins: [], id: "test_client", name: "test client", redirectUris: ["http://localhost:5173"], secret: ""
+})
+
+fastifyInstance.route({
+  method: 'GET',
+  url: '/app/*',
+  exposeHeadRoute: false,
+  handler: (request, reply) => {
+    reply.sendFile('index.html')
+  }
 })
 
 fastifyInstance.listen({port: 8080}, (err, address) => {

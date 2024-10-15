@@ -3,3 +3,4 @@ export interface AuthServerValidateResponse {
     valid: boolean;
     message: string;
 }
+//# sourceMappingURL=auth-server-validate.d.ts.map

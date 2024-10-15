@@ -1,5 +1,6 @@
-import {FastifyInstance} from "fastify";
+import {FastifyInstance, FastifyReply} from "fastify";
 import OauthClientRepository from "../../application/auth/oauth-client-repository";
+import {AuthServerValidateResponse} from "@shared/auth-server-validate";
 
 export default class AuthController {
 
@@ -17,16 +18,12 @@ export default class AuthController {
       const client = this.repo.findById(client_id) ?? null;
 
       if (!client)
-        return reply.code(400).send({error: 'invalid_client'});
-
-      // if (!client.allowOrigins.includes(request.headers.host))
-      //   return reply.code(400).send({error: 'invalid_origin'});
+        return this.replyValidateResponse(reply, {code: 400, valid: false, message: 'client with id not found'});
 
       if (!client.redirectUris.includes(redirect_uri))
-        return reply.code(400).send({error: 'invalid_redirect_uri'});
+        return this.replyValidateResponse(reply, {code: 400, valid: false, message: 'redirect_uri is not valid'});
 
-
-      reply.code(200).sendFile('login.html');
+      this.replyValidateResponse(reply, {code: 200, valid: true, message: 'ok'});
     });
 
     // app.post<{
@@ -41,7 +38,10 @@ export default class AuthController {
     //
     //   reply.redirect(`${redirect_uri}?code=${authorizationCode}`);
     // });
+  }
 
+  private replyValidateResponse(reply: FastifyReply, response: AuthServerValidateResponse) {
+    reply.code(response.code).send(response);
   }
 
   // async login(request, reply) {

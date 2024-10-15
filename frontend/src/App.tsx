@@ -12,7 +12,7 @@ function App() {
 
   return (
     <>
-      <Router>
+      <Router basename={"/app"}>
         <div className="App">
           <Routes>
             <Route path="/login" element={<LoginPage viewModel={new LoginPageViewModel(queryParams)}/>}/>
