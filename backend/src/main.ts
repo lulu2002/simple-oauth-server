@@ -39,7 +39,7 @@ const controller = new AuthController(authRepo, registerUser, loginUser);
 controller.registerRoutes(fastifyInstance);
 
 authRepo.add({
-  allowOrigins: [], id: "test_client", name: "test client", redirectUris: ["http://localhost:5173"], secret: ""
+  allowOrigins: [], id: "test_client", name: "test client", redirectUris: ["http://localhost:5173/callback"], secret: ""
 })
 
 fastifyInstance.listen({port: 8080}, (err, address) => {

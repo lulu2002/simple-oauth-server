@@ -2,6 +2,7 @@ export interface AuthLoginResult {
   success: boolean;
   message: string;
   code: string;
+  redirectUri: string;
 }
 
 export interface AuthLoginContext {

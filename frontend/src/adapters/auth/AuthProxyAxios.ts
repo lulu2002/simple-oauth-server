@@ -36,10 +36,10 @@ export default class AuthProxyAxios implements AuthProxy {
         redirect_uri: ctx.redirectUri
       };
       const data: AuthServerLoginResponse = (await this.axios.post<AuthServerLoginResponse>('/api/login', body)).data;
-      return {success: data.success, message: data.message, code: data.token};
+      return {success: data.success, message: data.message, code: data.token, redirectUri: ctx.redirectUri};
     } catch (error) {
       console.error('Failed to login:', error);
-      return {success: false, message: 'failed to login', code: ''};
+      return {success: false, message: 'failed to login', code: '', redirectUri: ''};
     }
 
   }

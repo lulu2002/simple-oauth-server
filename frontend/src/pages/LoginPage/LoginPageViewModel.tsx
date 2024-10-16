@@ -29,16 +29,16 @@ export default class LoginPageViewModel {
     const redirectUri = this.queryParams.get('redirect_uri');
 
     if (!clientId)
-      return {success: false, message: 'client_id is not present', code: ''};
+      return {success: false, message: 'client_id is not present', code: '', redirectUri: ''};
 
     if (!redirectUri)
-      return {success: false, message: 'redirect_uri is not present', code: ''};
+      return {success: false, message: 'redirect_uri is not present', code: '', redirectUri: ''};
 
     return this.client.login({username, password, clientId, redirectUri});
   }
 
-  closeWithCode(code: string) {
-    window.opener.postMessage({type: 'oauth-success', token: code}, window.location.origin);
+  closeWithCode(code: string, redirectUri: string) {
+    window.opener.postMessage({type: 'oauth-success', token: code}, redirectUri);
     window.close();
   }
 }

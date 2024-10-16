@@ -24,9 +24,9 @@ export default class AuthProxyInMemory implements AuthProxy {
     const account = this.accounts.get(ctx.username) ?? null;
 
     if (account === null || account.password !== ctx.password)
-      return {success: false, message: 'invalid credentials', code: ''};
+      return {success: false, message: 'invalid credentials', code: '', redirectUri: ''};
 
-    return {success: true, message: 'ok', code: 'code'};
+    return {success: true, message: 'ok', code: 'code', redirectUri: ctx.redirectUri};
   }
 
   async addClient(clientId: string, redirectUri: string): Promise<void> {

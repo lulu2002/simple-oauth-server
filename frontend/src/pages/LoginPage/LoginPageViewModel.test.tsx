@@ -70,7 +70,7 @@ describe('LoginPageViewModel', () => {
       await registerAccount();
       provideValidParam();
 
-      await assertLoginResult({success: true, message: 'ok', code: 'code'});
+      await assertLoginResult({success: true, message: 'ok', code: 'code', redirectUri: 'uri'});
     });
 
     async function assertLoginResult(result: AuthLoginResult, block: () => void = () => {
@@ -81,7 +81,7 @@ describe('LoginPageViewModel', () => {
 
     async function assertLoginFailed(message: string, block: () => void = () => {
     }) {
-      await assertLoginResult({success: false, message: message, code: ""}, block);
+      await assertLoginResult({success: false, message: message, code: "", redirectUri: ""}, block);
     }
 
   });
