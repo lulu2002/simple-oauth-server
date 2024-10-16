@@ -6,6 +6,7 @@ import fastifyStatic from '@fastify/static';
 import AuthController from "@src/adapters/auth/auth-controller";
 import OauthClientRepositoryInMemory from "@test-fixture/application/auth/oauth-client-repository-in-memory";
 import path from 'node:path'
+import * as process from "node:process";
 
 const fastifyInstance = fastify();
 fastifyInstance.register(fastifyFormbody);

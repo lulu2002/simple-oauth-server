@@ -1,22 +1,23 @@
 import LoginPageViewModel, {AuthLoginResult} from "./LoginPageViewModel.tsx";
-import axios from "axios";
+import {AxiosInstance} from "axios";
 import AuthClientCheckResult from "./AuthClientCheckResult.ts";
 import QueryParamsMock from "@src/application/QueryParamsMock.ts";
 import {AuthServerValidateResponse} from "@shared/auth-server-validate.ts";
 import {AuthServerLoginRequest, AuthServerLoginResponse} from "@shared/auth-server-login.ts";
+import {AxiosClientFixed} from "@src/application/AxiosClientFixed.ts";
+import {mock, MockProxy} from "jest-mock-extended";
 
-
-jest.mock('axios');
-const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe('LoginPageViewModel', () => {
 
   let queryParams: QueryParamsMock;
   let viewModel: LoginPageViewModel;
+  let axioInstance: MockProxy<AxiosInstance>;
 
   beforeEach(() => {
     queryParams = new QueryParamsMock();
-    viewModel = new LoginPageViewModel(queryParams);
+    axioInstance = mock<AxiosInstance>();
+    viewModel = new LoginPageViewModel(queryParams, new AxiosClientFixed(axioInstance));
   });
 
   afterEach(() => {
@@ -57,7 +58,7 @@ describe('LoginPageViewModel', () => {
     }
 
     function mockAxiosResponse(data: AuthServerValidateResponse) {
-      mockedAxios.get.mockImplementation((url, cfg) => {
+      axioInstance.get.mockImplementation((url, cfg) => {
         if (url === '/api/authorize' && cfg?.params?.client_id === 'id' && cfg?.params?.redirect_uri === 'uri') {
           return Promise.resolve({data: data});
         } else {
@@ -89,7 +90,7 @@ describe('LoginPageViewModel', () => {
     });
 
     function mockLoginResponse(response: AuthServerLoginResponse) {
-      mockedAxios.post.mockImplementation((url, body) => {
+      axioInstance.post.mockImplementation((url, body) => {
         const data = body as AuthServerLoginRequest;
         if (url === '/api/login' && data.username === 'user' && data.password === 'pass' && data.client_id === 'id' && data.redirect_uri === 'uri') {
           return Promise.resolve({data: response});
