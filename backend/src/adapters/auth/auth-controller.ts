@@ -4,23 +4,14 @@ import {AuthServerRegisterRequest} from "@shared/auth-server-register";
 import {AuthServerLoginRequest, AuthServerLoginResponse} from "@shared/auth-server-login";
 import OauthClientRepository from "@src/application/auth/oauth-client-repository";
 import RegisterUser, {RegisterUserError} from "@src/application/user/register-user";
-import UserRepository from "@src/application/user/user-repository";
-import PasswordHashing from "@src/application/hashing/PasswordHashing";
-import RandomCodeGenerator from "@src/application/util/random-code-generator";
-import AuthCodeCache from "@src/application/auth/auth-code-cache";
-import CurrentTimeStamp from "@src/application/util/current-time-stamp";
+import LoginUser from "@src/application/user/login-user";
 
 export default class AuthController {
 
   constructor(
     private clientRepo: OauthClientRepository,
-    private userRepo: UserRepository,
-    private hashing: PasswordHashing,
     private registerUser: RegisterUser,
-    private codeGenerator: RandomCodeGenerator,
-    private codeCache: AuthCodeCache,
-    private currentTimeStamp: CurrentTimeStamp,
-    private expiresIn: number,
+    private loginUser: LoginUser
   ) {
   }
 
@@ -59,38 +50,21 @@ export default class AuthController {
     app.post<{
       Body: AuthServerLoginRequest
     }>('/api/login', async (request, reply) => {
-      const {client_id, redirect_uri, password, username} = request.body;
-      const client = this.clientRepo.findById(client_id) ?? null;
+      const result = await this.loginUser.login(request.body);
 
-      if (!client)
-        return this.replyLoginResponse(reply, 400, {success: false, message: 'invalid_client', token: ""});
-
-      if (!client.redirectUris.includes(redirect_uri))
-        return this.replyLoginResponse(reply, 400, {success: false, message: 'invalid_redirect_uri', token: ""});
-
-      const user = await this.userRepo.findByEmail(username) ?? null;
-
-      if (!user || !await this.hashing.verify(password, user.password))
-        return this.replyLoginResponse(reply, 401, {success: false, message: 'invalid_credentials', token: ""});
-
-      const code = this.codeGenerator.generate(10);
-      await this.codeCache.saveToken(client.id, user.id, code, this.currentTimeStamp.get() + this.expiresIn);
-      this.replyLoginResponse(reply, 200, {success: true, message: 'ok', token: code});
+      switch (result.type) {
+        case "invalid_client":
+          return this.replyLoginResponse(reply, 400, {success: false, message: 'invalid_client', token: ''});
+        case "invalid_redirect_uri":
+          return this.replyLoginResponse(reply, 400, {success: false, message: 'invalid_redirect_uri', token: ''});
+        case "invalid_credentials":
+          return this.replyLoginResponse(reply, 401, {success: false, message: 'invalid_credentials', token: ''});
+        case "ok":
+          return this.replyLoginResponse(reply, 200, {success: true, message: 'ok', token: result.token});
+        default:
+          throw new Error('Invalid login result');
+      }
     });
-
-
-    // app.post<{
-    //   Body: { username: string, password: string, authorizationCode: string, redirect_uri: string }
-    // }>('/login', (request, reply) => {
-    //   const {username, password, authorizationCode, redirect_uri} = request.body;
-    //
-    //   const user = users[username];
-    //   if (!user || user.password !== password) {
-    //     return reply.code(401).send('Invalid credentials');
-    //   }
-    //
-    //   reply.redirect(`${redirect_uri}?code=${authorizationCode}`);
-    // });
   }
 
   private replyValidateResponse(reply: FastifyReply, response: AuthServerValidateResponse) {

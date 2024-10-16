@@ -2,41 +2,44 @@ import fastify from 'fastify';
 import fastifyCookie from '@fastify/cookie';
 import fastifyCors from '@fastify/cors';
 import fastifyFormbody from '@fastify/formbody';
-import fastifyStatic from '@fastify/static';
 import AuthController from "@src/adapters/auth/auth-controller";
 import OauthClientRepositoryInMemory from "@test-fixture/application/auth/oauth-client-repository-in-memory";
-import path from 'node:path'
 import * as process from "node:process";
 import UserRepositoryInMemory from "@test-fixture/application/user/user-repository-in-memory";
 import RegisterUser from "@src/application/user/register-user";
+import PasswordHashingImpl from "@src/adapters/hashing/PasswordHashingImpl";
+import LoginUser from "@src/application/user/login-user";
+import RandomCodeGeneratorImpl from "@src/application/util/random-code-generator-impl";
+import AuthCodeCacheInMemory from "@test-fixture/application/auth/auth-code-cache-in-memory";
+import CurrentTimeStampImpl from "@src/application/util/current-time-stamp-impl";
 
 const fastifyInstance = fastify();
 fastifyInstance.register(fastifyFormbody);
 fastifyInstance.register(fastifyCookie);
 fastifyInstance.register(fastifyCors, {origin: true});
-fastifyInstance.register(fastifyStatic, {
-  root: path.join(__dirname, '../../frontend/dist'),
-  prefix: '/'
-});
 
 const authRepo = new OauthClientRepositoryInMemory();
 const userRepo = new UserRepositoryInMemory();
-const registerUser = new RegisterUser(userRepo);
-const controller = new AuthController(authRepo, registerUser);
+const currentTimestamp = new CurrentTimeStampImpl();
+const codeCache = new AuthCodeCacheInMemory(currentTimestamp);
+const passwordHashing = new PasswordHashingImpl(10);
+const codeGenerator = new RandomCodeGeneratorImpl();
+const registerUser = new RegisterUser(userRepo, passwordHashing);
+const loginUser = new LoginUser(
+  authRepo,
+  userRepo,
+  passwordHashing,
+  codeGenerator,
+  codeCache,
+  currentTimestamp,
+  1000 * 60 * 5
+)
+const controller = new AuthController(authRepo, registerUser, loginUser);
 
 controller.registerRoutes(fastifyInstance);
 
 authRepo.add({
   allowOrigins: [], id: "test_client", name: "test client", redirectUris: ["http://localhost:5173"], secret: ""
-})
-
-fastifyInstance.route({
-  method: 'GET',
-  url: '/app/*',
-  exposeHeadRoute: false,
-  handler: (request, reply) => {
-    reply.sendFile('index.html')
-  }
 })
 
 fastifyInstance.listen({port: 8080}, (err, address) => {

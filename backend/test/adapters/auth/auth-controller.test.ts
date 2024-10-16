@@ -13,6 +13,7 @@ import RandomCodeGenerator from "@src/application/util/random-code-generator";
 import RandomCodeGeneratorFixed from "@test-fixture/application/util/random-code-generator-fixed";
 import AuthCodeCacheInMemory from "@test-fixture/application/auth/auth-code-cache-in-memory";
 import CurrentTimeStampMock from "@test-fixture/application/util/current-time-stamp-mock";
+import LoginUser from "@src/application/user/login-user";
 
 
 describe('AuthController', () => {
@@ -50,13 +51,16 @@ describe('AuthController', () => {
 
     new AuthController(
       clientRepository,
-      userRepository,
-      hashing,
       new RegisterUser(userRepository, hashing),
-      codeGenerator,
-      codeCache,
-      currentTime,
-      1001
+      new LoginUser(
+        clientRepository,
+        userRepository,
+        hashing,
+        codeGenerator,
+        codeCache,
+        currentTime,
+        1001
+      ),
     ).registerRoutes(app);
 
     clientRepository.add(client);
