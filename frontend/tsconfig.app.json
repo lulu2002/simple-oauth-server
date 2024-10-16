@@ -10,7 +10,7 @@
     "module": "ESNext",
     "skipLibCheck": true,
     /* Bundler mode */
-    "moduleResolution": "Node",
+    "moduleResolution": "bundler",
     "allowImportingTsExtensions": false,
     "isolatedModules": true,
     "moduleDetection": "force",
@@ -21,8 +21,8 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "baseUrl": "./",
     "types": [ "jest", "@testing-library/jest-dom"],
+    "baseUrl": ".",
     "paths": {
       "@src/*": [
         "src/*"
@@ -32,12 +32,8 @@
       ]
     }
   },
-  "references": [
-    {
-      "path": "../shared"
-    }
-  ],
   "include": [
     "src"
   ]
 }
+

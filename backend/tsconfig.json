@@ -11,8 +11,8 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "moduleResolution": "node",
-    "outDir": "./dist",
+    "moduleResolution": "bundler",
+    "outDir": "./build",
     "rootDir": "./",
     "baseUrl": ".",
     "paths": {
