@@ -1,23 +1,22 @@
 import fastify, {FastifyInstance} from "fastify";
-import fastifyStatic from "@fastify/static";
 import AuthController from "@src/adapters/auth/auth-controller";
+import {AuthServerRegisterRequest, AuthServerRegisterResponse} from "@shared/auth-server-register";
 import OauthClientRepositoryInMemory from "@test-fixture/application/auth/oauth-client-repository-in-memory";
-import OauthClient from "@domain/oauth-client";
-import os from 'node:os';
-import fs from 'node:fs';
+import UserRepositoryInMemory from "@test-fixture/application/user/user-repository-in-memory";
+import RegisterUser from "@src/application/user/register-user";
+import OauthClient from "@src/domain/oauth-client";
 
 
 describe('AuthController', () => {
 
   let app: FastifyInstance;
   let clientRepository: OauthClientRepositoryInMemory;
-  let tempDir: string;
+  let userRepository: UserRepositoryInMemory;
 
   let client: OauthClient;
 
   beforeEach(() => {
     app = fastify();
-    tempDir = os.tmpdir();
     client = {
       id: "my_client_id",
       name: "test client",
@@ -30,17 +29,16 @@ describe('AuthController', () => {
       ],
     }
 
-    app.register(fastifyStatic, {
-      root: tempDir,
-      prefix: '/'
-    });
-
-    fs.writeFileSync(`${tempDir}/login.html`, "hello");
-
     clientRepository = new OauthClientRepositoryInMemory();
-    new AuthController(clientRepository).registerRoutes(app);
+    userRepository = new UserRepositoryInMemory();
+
+    new AuthController(clientRepository, new RegisterUser(userRepository)).registerRoutes(app);
 
     clientRepository.add(client);
+  });
+
+  afterEach(() => {
+    app.close();
   });
 
   describe("GET /authorize", () => {
@@ -116,5 +114,48 @@ describe('AuthController', () => {
       expect(response.body).toBe("hello");
     });
   });
+
+  describe("register", () => {
+
+    it('should fail if email is invalid', async () => {
+      await assertRegister({email: "invalid", password: "password"}, 400, {
+        success: false,
+        message: "invalid_email"
+      });
+    });
+
+    it('should fail if account already exists', async () => {
+      const user = userRepository.create("test@gmail.com", "password");
+      await assertRegister({email: user.email, password: "another"}, 400, {
+        success: false,
+        message: "account_already_exists"
+      });
+    });
+
+    it('should create', async () => {
+      await assertRegister({email: "test@gmail.com", password: "password"}, 200, {
+        success: true,
+        message: "ok"
+      });
+
+      const user = userRepository.findByEmail("test@gmail.com");
+
+      expect(user?.email).toBe("test@gmail.com");
+      expect(user?.password).toBe("password");
+    });
+
+    async function assertRegister(request: AuthServerRegisterRequest, code: number, response: AuthServerRegisterResponse) {
+      const res = await app.inject({
+        method: 'POST',
+        url: '/api/register',
+        body: request
+      });
+
+      expect(res.statusCode).toBe(code);
+      expect(res.json()).toEqual(response);
+    }
+
+  });
+
 
 });

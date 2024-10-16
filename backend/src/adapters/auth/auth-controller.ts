@@ -1,11 +1,14 @@
 import {FastifyInstance, FastifyReply} from "fastify";
-import OauthClientRepository from "../../application/auth/oauth-client-repository";
 import {AuthServerValidateResponse} from "@shared/auth-server-validate";
+import {AuthServerRegisterRequest} from "@shared/auth-server-register";
+import OauthClientRepository from "@src/application/auth/oauth-client-repository";
+import RegisterUser, {RegisterUserError} from "@src/application/user/register-user";
 
 export default class AuthController {
 
   constructor(
-    private repo: OauthClientRepository,
+    private clientRepo: OauthClientRepository,
+    private registerUser: RegisterUser
   ) {
   }
 
@@ -15,7 +18,7 @@ export default class AuthController {
       Headers: { host: string }
     }>('/api/authorize', (request, reply) => {
       const {client_id, redirect_uri} = request.query;
-      const client = this.repo.findById(client_id) ?? null;
+      const client = this.clientRepo.findById(client_id) ?? null;
 
       if (!client)
         return this.replyValidateResponse(reply, {code: 400, valid: false, message: 'client with id not found'});
@@ -25,6 +28,22 @@ export default class AuthController {
 
       this.replyValidateResponse(reply, {code: 200, valid: true, message: 'ok'});
     });
+
+    app.post<{
+      Body: AuthServerRegisterRequest
+    }>('/api/register', async (request, reply) => {
+      const {email, password} = request.body;
+      try {
+        const user = await this.registerUser.execute(email, password);
+        reply.send({success: true, message: 'ok'});
+      } catch (e) {
+        if (e instanceof RegisterUserError)
+          return reply.code(400).send({success: false, message: e.message});
+        else
+          throw e;
+      }
+    });
+
 
     // app.post<{
     //   Body: { username: string, password: string, authorizationCode: string, redirect_uri: string }

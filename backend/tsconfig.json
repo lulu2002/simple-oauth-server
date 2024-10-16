@@ -22,15 +22,6 @@
       "@test-fixture/*": [
         "test-fixture/*"
       ],
-      "@adapter/*": [
-        "src/adapter/*"
-      ],
-      "@application/*": [
-        "src/application/*"
-      ],
-      "@domain/*": [
-        "src/domain/*"
-      ],
       "@shared/*": [
         "../shared/src/*"
       ]

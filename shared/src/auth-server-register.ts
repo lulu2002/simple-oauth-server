@@ -1,5 +1,5 @@
 export interface AuthServerRegisterRequest {
-  username: string,
+  email: string,
   password: string,
 }
 
