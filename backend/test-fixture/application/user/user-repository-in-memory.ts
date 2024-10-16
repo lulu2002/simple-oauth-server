@@ -1,5 +1,6 @@
 import UserRepository from "@src/application/user/user-repository";
 import User from "@src/domain/user";
+import RandomCodeGeneratorImpl from "@src/application/util/random-code-generator-impl";
 
 export default class UserRepositoryInMemory implements UserRepository {
 
@@ -15,25 +16,13 @@ export default class UserRepositoryInMemory implements UserRepository {
 
   async create(email: string, password: string): Promise<User> {
     const user: User = {
-      id: this.makeId(10),
+      id: new RandomCodeGeneratorImpl().generate(10),
       email: email,
       password: password
     }
 
     this.users.push(user);
     return user;
-  }
-
-  private makeId(length: number): string {
-    let result = '';
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    const charactersLength = characters.length;
-    let counter = 0;
-    while (counter < length) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-      counter += 1;
-    }
-    return result;
   }
 
 }

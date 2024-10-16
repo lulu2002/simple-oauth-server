@@ -6,6 +6,9 @@ import OauthClientRepository from "@src/application/auth/oauth-client-repository
 import RegisterUser, {RegisterUserError} from "@src/application/user/register-user";
 import UserRepository from "@src/application/user/user-repository";
 import PasswordHashing from "@src/application/hashing/PasswordHashing";
+import RandomCodeGenerator from "@src/application/util/random-code-generator";
+import AuthCodeCache from "@src/application/auth/auth-code-cache";
+import CurrentTimeStamp from "@src/application/util/current-time-stamp";
 
 export default class AuthController {
 
@@ -14,6 +17,10 @@ export default class AuthController {
     private userRepo: UserRepository,
     private hashing: PasswordHashing,
     private registerUser: RegisterUser,
+    private codeGenerator: RandomCodeGenerator,
+    private codeCache: AuthCodeCache,
+    private currentTimeStamp: CurrentTimeStamp,
+    private expiresIn: number,
   ) {
   }
 
@@ -66,7 +73,9 @@ export default class AuthController {
       if (!user || !await this.hashing.verify(password, user.password))
         return this.replyLoginResponse(reply, 401, {success: false, message: 'invalid_credentials', token: ""});
 
-
+      const code = this.codeGenerator.generate(10);
+      await this.codeCache.saveToken(client.id, user.id, code, this.currentTimeStamp.get() + this.expiresIn);
+      this.replyLoginResponse(reply, 200, {success: true, message: 'ok', token: code});
     });
 
 

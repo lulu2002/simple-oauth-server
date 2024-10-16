@@ -9,7 +9,10 @@ import RegisterUser from "@src/application/user/register-user";
 import OauthClient from "@src/domain/oauth-client";
 import PasswordHashingImpl from "@src/adapters/hashing/PasswordHashingImpl";
 import PasswordHashing from "@src/application/hashing/PasswordHashing";
-import Dummy from "@test-fixture/domain/dummy";
+import RandomCodeGenerator from "@src/application/util/random-code-generator";
+import RandomCodeGeneratorFixed from "@test-fixture/application/util/random-code-generator-fixed";
+import AuthCodeCacheInMemory from "@test-fixture/application/auth/auth-code-cache-in-memory";
+import CurrentTimeStampMock from "@test-fixture/application/util/current-time-stamp-mock";
 
 
 describe('AuthController', () => {
@@ -18,6 +21,8 @@ describe('AuthController', () => {
   let clientRepository: OauthClientRepositoryInMemory;
   let userRepository: UserRepositoryInMemory;
   let hashing: PasswordHashing
+  let codeGenerator: RandomCodeGenerator
+  let codeCache: AuthCodeCacheInMemory
 
   let client: OauthClient;
 
@@ -35,15 +40,23 @@ describe('AuthController', () => {
       ],
     }
 
+    const currentTime = new CurrentTimeStampMock(1000);
     clientRepository = new OauthClientRepositoryInMemory();
     userRepository = new UserRepositoryInMemory();
     hashing = new PasswordHashingImpl(10);
+    codeGenerator = new RandomCodeGeneratorFixed("c")
+    codeCache = new AuthCodeCacheInMemory(currentTime);
+
 
     new AuthController(
       clientRepository,
       userRepository,
       hashing,
-      new RegisterUser(userRepository, hashing)
+      new RegisterUser(userRepository, hashing),
+      codeGenerator,
+      codeCache,
+      currentTime,
+      1001
     ).registerRoutes(app);
 
     clientRepository.add(client);
@@ -192,7 +205,7 @@ describe('AuthController', () => {
         {
           username: "mail@gmail.com",
           password: "password",
-          redirect_uri: "http://localhost:5173/callback",
+          redirect_uri: client.redirectUris[0],
           client_id: client.id,
         },
         401,
@@ -202,6 +215,26 @@ describe('AuthController', () => {
           token: ""
         }
       );
+    });
+
+    it('should success and response code', async () => {
+      const user = await userRepository.create("mail@gmail.com", await hashing.hash("password"))
+      await assertLogin(
+        {
+          username: "mail@gmail.com",
+          password: "password",
+          redirect_uri: client.redirectUris[0],
+          client_id: client.id,
+        },
+        200,
+        {
+          success: true,
+          message: "ok",
+          token: "cccccccccc"
+        });
+
+      expect(codeCache.getExpiresAt(client.id, user.id)).toBe(2001);
+      expect(await codeCache.getToken(client.id, user.id)).toBe("cccccccccc");
     });
 
     async function assertLogin(request: AuthServerLoginRequest, code: number, response: AuthServerLoginResponse) {
