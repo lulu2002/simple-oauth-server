@@ -1,14 +1,19 @@
 import {FastifyInstance, FastifyReply} from "fastify";
 import {AuthServerValidateResponse} from "@shared/auth-server-validate";
 import {AuthServerRegisterRequest} from "@shared/auth-server-register";
+import {AuthServerLoginRequest, AuthServerLoginResponse} from "@shared/auth-server-login";
 import OauthClientRepository from "@src/application/auth/oauth-client-repository";
 import RegisterUser, {RegisterUserError} from "@src/application/user/register-user";
+import UserRepository from "@src/application/user/user-repository";
+import PasswordHashing from "@src/application/hashing/PasswordHashing";
 
 export default class AuthController {
 
   constructor(
     private clientRepo: OauthClientRepository,
-    private registerUser: RegisterUser
+    private userRepo: UserRepository,
+    private hashing: PasswordHashing,
+    private registerUser: RegisterUser,
   ) {
   }
 
@@ -44,6 +49,26 @@ export default class AuthController {
       }
     });
 
+    app.post<{
+      Body: AuthServerLoginRequest
+    }>('/api/login', async (request, reply) => {
+      const {client_id, redirect_uri, password, username} = request.body;
+      const client = this.clientRepo.findById(client_id) ?? null;
+
+      if (!client)
+        return this.replyLoginResponse(reply, 400, {success: false, message: 'invalid_client', token: ""});
+
+      if (!client.redirectUris.includes(redirect_uri))
+        return this.replyLoginResponse(reply, 400, {success: false, message: 'invalid_redirect_uri', token: ""});
+
+      const user = await this.userRepo.findByEmail(username) ?? null;
+
+      if (!user || !await this.hashing.verify(password, user.password))
+        return this.replyLoginResponse(reply, 401, {success: false, message: 'invalid_credentials', token: ""});
+
+
+    });
+
 
     // app.post<{
     //   Body: { username: string, password: string, authorizationCode: string, redirect_uri: string }
@@ -61,6 +86,10 @@ export default class AuthController {
 
   private replyValidateResponse(reply: FastifyReply, response: AuthServerValidateResponse) {
     reply.code(response.code).send(response);
+  }
+
+  private replyLoginResponse(reply: FastifyReply, code: number, response: AuthServerLoginResponse) {
+    reply.code(code).send(response);
   }
 
   // async login(request, reply) {

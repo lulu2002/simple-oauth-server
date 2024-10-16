@@ -2,10 +2,14 @@ import fastify, {FastifyInstance} from "fastify";
 import AuthController from "@src/adapters/auth/auth-controller";
 import {AuthServerRegisterRequest, AuthServerRegisterResponse} from "@shared/auth-server-register";
 import {AuthServerValidateResponse} from "@shared/auth-server-validate";
+import {AuthServerLoginRequest, AuthServerLoginResponse} from "@shared/auth-server-login";
 import OauthClientRepositoryInMemory from "@test-fixture/application/auth/oauth-client-repository-in-memory";
 import UserRepositoryInMemory from "@test-fixture/application/user/user-repository-in-memory";
 import RegisterUser from "@src/application/user/register-user";
 import OauthClient from "@src/domain/oauth-client";
+import PasswordHashingImpl from "@src/adapters/hashing/PasswordHashingImpl";
+import PasswordHashing from "@src/application/hashing/PasswordHashing";
+import Dummy from "@test-fixture/domain/dummy";
 
 
 describe('AuthController', () => {
@@ -13,6 +17,7 @@ describe('AuthController', () => {
   let app: FastifyInstance;
   let clientRepository: OauthClientRepositoryInMemory;
   let userRepository: UserRepositoryInMemory;
+  let hashing: PasswordHashing
 
   let client: OauthClient;
 
@@ -32,8 +37,14 @@ describe('AuthController', () => {
 
     clientRepository = new OauthClientRepositoryInMemory();
     userRepository = new UserRepositoryInMemory();
+    hashing = new PasswordHashingImpl(10);
 
-    new AuthController(clientRepository, new RegisterUser(userRepository)).registerRoutes(app);
+    new AuthController(
+      clientRepository,
+      userRepository,
+      hashing,
+      new RegisterUser(userRepository, hashing)
+    ).registerRoutes(app);
 
     clientRepository.add(client);
   });
@@ -92,7 +103,7 @@ describe('AuthController', () => {
     });
 
     it('should fail if account already exists', async () => {
-      const user = userRepository.create("test@gmail.com", "password");
+      const user = await userRepository.create("test@gmail.com", "password");
       await assertRegister({email: user.email, password: "another"}, 400, {
         success: false,
         message: "account_already_exists"
@@ -105,10 +116,10 @@ describe('AuthController', () => {
         message: "ok"
       });
 
-      const user = userRepository.findByEmail("test@gmail.com");
+      const user = await userRepository.findByEmail("test@gmail.com");
 
       expect(user?.email).toBe("test@gmail.com");
-      expect(user?.password).toBe("password");
+      expect(await hashing.verify("password", user?.password!)).toBeTruthy();
     });
 
     async function assertRegister(request: AuthServerRegisterRequest, code: number, response: AuthServerRegisterResponse) {
@@ -122,6 +133,87 @@ describe('AuthController', () => {
       expect(res.json()).toEqual(response);
     }
 
+  });
+
+  describe("login", () => {
+
+    it('should fail if client id is not valid', async () => {
+      await assertLogin(
+        {
+          username: "mail@gmail.com",
+          password: "password",
+          redirect_uri: "http://localhost:5173/callback",
+          client_id: "not_exists",
+        },
+        400,
+        {
+          success: false,
+          message: "invalid_client",
+          token: ""
+        });
+    });
+
+    it('should fail if redirect uri is invalid', async () => {
+      await assertLogin(
+        {
+          username: "mail@gmail.com",
+          password: "password",
+          redirect_uri: "http://localhost:5173/invalid",
+          client_id: client.id,
+        },
+        400,
+        {
+          success: false,
+          message: "invalid_redirect_uri",
+          token: ""
+        });
+    });
+
+    it('should fail if user not exists', async () => {
+      await assertLogin(
+        {
+          username: "mail@gmail.com",
+          password: "password",
+          redirect_uri: client.redirectUris[0],
+          client_id: client.id,
+        },
+        401,
+        {
+          success: false,
+          message: "invalid_credentials",
+          token: ""
+        }
+      );
+    });
+
+    it('should fail if password not match', async () => {
+      await userRepository.create("mail@gmail.com", await hashing.hash("psw"))
+      await assertLogin(
+        {
+          username: "mail@gmail.com",
+          password: "password",
+          redirect_uri: "http://localhost:5173/callback",
+          client_id: client.id,
+        },
+        401,
+        {
+          success: false,
+          message: "invalid_credentials",
+          token: ""
+        }
+      );
+    });
+
+    async function assertLogin(request: AuthServerLoginRequest, code: number, response: AuthServerLoginResponse) {
+      const res = await app.inject({
+        method: 'POST',
+        url: '/api/login',
+        body: request
+      });
+
+      expect(res.statusCode).toBe(code);
+      expect(res.json()).toEqual(response);
+    }
   });
 
 

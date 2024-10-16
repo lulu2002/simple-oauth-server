@@ -7,6 +7,8 @@ import AuthController from "@src/adapters/auth/auth-controller";
 import OauthClientRepositoryInMemory from "@test-fixture/application/auth/oauth-client-repository-in-memory";
 import path from 'node:path'
 import * as process from "node:process";
+import UserRepositoryInMemory from "@test-fixture/application/user/user-repository-in-memory";
+import RegisterUser from "@src/application/user/register-user";
 
 const fastifyInstance = fastify();
 fastifyInstance.register(fastifyFormbody);
@@ -17,12 +19,14 @@ fastifyInstance.register(fastifyStatic, {
   prefix: '/'
 });
 
-const repo = new OauthClientRepositoryInMemory();
-const controller = new AuthController(repo);
+const authRepo = new OauthClientRepositoryInMemory();
+const userRepo = new UserRepositoryInMemory();
+const registerUser = new RegisterUser(userRepo);
+const controller = new AuthController(authRepo, registerUser);
 
 controller.registerRoutes(fastifyInstance);
 
-repo.add({
+authRepo.add({
   allowOrigins: [], id: "test_client", name: "test client", redirectUris: ["http://localhost:5173"], secret: ""
 })
 

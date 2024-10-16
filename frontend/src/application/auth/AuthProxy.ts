@@ -1,6 +1,6 @@
-import {AuthLoginContext, AuthLoginResult} from "@src/domain/AuthLogin.tsx";
-import {RegisterAccountContext, RegisterAccountResult} from "@src/domain/RegisterAccount.ts";
-import AuthCheckResult from "@src/domain/AuthCheckResult.ts";
+import {AuthLoginContext, AuthLoginResult} from "@src/domain/AuthLogin";
+import {RegisterAccountContext, RegisterAccountResult} from "@src/domain/RegisterAccount";
+import AuthCheckResult from "@src/domain/AuthCheckResult";
 
 export interface AuthProxy {
   login(ctx: AuthLoginContext): Promise<AuthLoginResult>;

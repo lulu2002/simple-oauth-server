@@ -1,22 +1,26 @@
 import UserRepository from "@src/application/user/user-repository";
 import User from "@src/domain/user";
 import {AuthServerRegisterResponse} from "@shared/auth-server-register";
+import PasswordHashing from "@src/application/hashing/PasswordHashing";
 
 export default class RegisterUser {
 
-  constructor(private userRepository: UserRepository) {
+  constructor(
+    private userRepository: UserRepository,
+    private passwordHashing: PasswordHashing
+  ) {
   }
 
   async execute(email: string, password: string): Promise<User> {
     if (!this.isValidEmail(email))
       throw new RegisterUserError('invalid_email');
 
-    const user = this.userRepository.findByEmail(email);
+    const user = await this.userRepository.findByEmail(email);
 
     if (user)
       throw new RegisterUserError('account_already_exists');
 
-    return this.userRepository.create(email, password);
+    return this.userRepository.create(email, await this.passwordHashing.hash(password));
   }
 
   private isValidEmail(email: string): boolean {

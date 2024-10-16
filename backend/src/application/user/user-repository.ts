@@ -1,9 +1,9 @@
 import User from "@src/domain/user";
 
 export default interface UserRepository {
-  findById(id: string): User | undefined;
+  findById(id: string): Promise<User | undefined>;
 
-  findByEmail(email: string): User | undefined;
+  findByEmail(email: string): Promise<User | undefined>;
 
-  create(email: string, password: string): User;
+  create(email: string, password: string): Promise<User>;
 }

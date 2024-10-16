@@ -1,12 +1,12 @@
 import './App.css'
 import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
-import LoginPage from "./pages/LoginPage/LoginPage.tsx";
-import LoginPageViewModel from "./pages/LoginPage/LoginPageViewModel.tsx";
-import RegisterPage from "@src/pages/RegisterPage/RegisterPage.tsx";
-import QueryParamsImpl from "@src/application/query/QueryParamsImpl.ts";
-import AuthProxyAxios from "@src/adapters/auth/AuthProxyAxios.ts";
+import LoginPage from "./pages/LoginPage/LoginPage";
+import LoginPageViewModel from "./pages/LoginPage/LoginPageViewModel";
+import RegisterPage from "@src/pages/RegisterPage/RegisterPage";
+import QueryParamsImpl from "@src/application/query/QueryParamsImpl";
+import AuthProxyAxios from "@src/adapters/auth/AuthProxyAxios";
 import axios from "axios";
-import RegisterPageViewModel from "@src/pages/RegisterPage/RegisterPageViewModel.ts";
+import RegisterPageViewModel from "@src/pages/RegisterPage/RegisterPageViewModel";
 
 function App() {
 

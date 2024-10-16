@@ -1,6 +1,6 @@
-import RegisterPageViewModel from "@src/pages/RegisterPage/RegisterPageViewModel.ts";
-import AuthProxyInMemory from "@src/application/auth/AuthProxyInMemory.ts";
-import {RegisterAccountResult} from "@src/domain/RegisterAccount.ts";
+import RegisterPageViewModel from "@src/pages/RegisterPage/RegisterPageViewModel";
+import AuthProxyInMemory from "@src/application/auth/AuthProxyInMemory";
+import {RegisterAccountResult} from "@src/domain/RegisterAccount";
 
 
 describe('RegisterPageViewModel', () => {

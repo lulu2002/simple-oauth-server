@@ -1,5 +1,5 @@
-import {AuthProxy} from "@src/application/auth/AuthProxy.ts";
-import {RegisterAccountResult} from "@src/domain/RegisterAccount.ts";
+import {AuthProxy} from "@src/application/auth/AuthProxy";
+import {RegisterAccountResult} from "@src/domain/RegisterAccount";
 
 export default class RegisterPageViewModel {
 

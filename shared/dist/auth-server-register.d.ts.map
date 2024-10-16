@@ -1,0 +1,1 @@
+{"version":3,"file":"auth-server-register.d.ts","sourceRoot":"","sources":["../src/auth-server-register.ts"],"names":[],"mappings":"AAAA,MAAM,WAAW,yBAAyB;IACxC,KAAK,EAAE,MAAM,CAAC;IACd,QAAQ,EAAE,MAAM,CAAC;CAClB;AAED,MAAM,WAAW,0BAA0B;IACzC,OAAO,EAAE,OAAO,CAAC;IACjB,OAAO,EAAE,IAAI,GAAG,wBAAwB,GAAG,eAAe,GAAG,kBAAkB,GAAG,eAAe,CAAC;CACnG"}

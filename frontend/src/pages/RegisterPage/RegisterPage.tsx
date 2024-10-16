@@ -1,14 +1,16 @@
 import {Container} from "react-bootstrap";
-import RegisterForm from "@src/components/RegisterForm.tsx";
-import RegisterPageViewModel from "@src/pages/RegisterPage/RegisterPageViewModel.ts";
+import RegisterForm from "@src/components/RegisterForm";
+import RegisterPageViewModel from "@src/pages/RegisterPage/RegisterPageViewModel";
 import {useState} from "react";
-import {RegisterAccountResult} from "@src/domain/RegisterAccount.ts";
+import {RegisterAccountResult} from "@src/domain/RegisterAccount";
+import {useNavigate} from "react-router-dom";
 
 
 const RegisterPage = ({viewModel}: { viewModel: RegisterPageViewModel }) => {
 
   const [isError, setIsError] = useState(false);
   const [reason, setReason] = useState<RegisterAccountResult["reason"]>("unknown_error");
+  const navigate = useNavigate();
 
   return (
     <>
@@ -22,11 +24,15 @@ const RegisterPage = ({viewModel}: { viewModel: RegisterPageViewModel }) => {
           loginLink="/login"
           keepQuery={true}
           onSubmit={(username, password) => {
+            setIsError(false);
             viewModel.register(username, password).then(result => {
               if (!result.success) {
                 setIsError(true);
                 setReason(result.reason);
+                return
               }
+
+              navigate({pathname: "/login", search: window.location.search});
             });
           }}/>
       </Container>

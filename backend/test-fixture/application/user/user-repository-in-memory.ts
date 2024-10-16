@@ -5,15 +5,15 @@ export default class UserRepositoryInMemory implements UserRepository {
 
   private users: User[] = [];
 
-  findById(id: string): User | undefined {
+  async findById(id: string): Promise<User | undefined> {
     return this.users.find(user => user.id === id);
   }
 
-  findByEmail(email: string): User | undefined {
+  async findByEmail(email: string): Promise<User | undefined> {
     return this.users.find(user => user.email === email);
   }
 
-  create(email: string, password: string): User {
+  async create(email: string, password: string): Promise<User> {
     const user: User = {
       id: this.makeId(10),
       email: email,

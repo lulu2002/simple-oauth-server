@@ -1,11 +1,11 @@
-import {AuthServerValidateResponse} from "@shared/auth-server-validate.ts";
-import {AuthServerLoginRequest, AuthServerLoginResponse} from "@shared/auth-server-login.ts";
-import {AuthServerRegisterRequest, AuthServerRegisterResponse} from "@shared/auth-server-register.ts";
-import {AxiosInstance} from "axios";
-import {AuthProxy} from "@src/application/auth/AuthProxy.ts";
-import AuthCheckResult from "@src/domain/AuthCheckResult.ts";
-import {AuthLoginContext, AuthLoginResult} from "@src/domain/AuthLogin.tsx";
-import {RegisterAccountContext, RegisterAccountResult} from "@src/domain/RegisterAccount.ts";
+import {AuthServerValidateResponse} from "@shared/auth-server-validate";
+import {AuthServerLoginRequest, AuthServerLoginResponse} from "@shared/auth-server-login";
+import {AuthServerRegisterRequest, AuthServerRegisterResponse} from "@shared/auth-server-register";
+import {AxiosError, AxiosInstance} from "axios";
+import {AuthProxy} from "@src/application/auth/AuthProxy";
+import AuthCheckResult from "@src/domain/AuthCheckResult";
+import {AuthLoginContext, AuthLoginResult} from "@src/domain/AuthLogin";
+import {RegisterAccountContext, RegisterAccountResult} from "@src/domain/RegisterAccount";
 
 export default class AuthProxyAxios implements AuthProxy {
 
@@ -47,15 +47,22 @@ export default class AuthProxyAxios implements AuthProxy {
   async registerAccount(request: RegisterAccountContext): Promise<RegisterAccountResult> {
     try {
       const body: AuthServerRegisterRequest = {
-        username: request.email,
+        email: request.email,
         password: request.password,
       };
       const data: AuthServerRegisterResponse = (await this.axios.post<AuthServerRegisterResponse>('/api/register', body)).data;
       return {success: data.success, reason: data.message};
     } catch (error) {
-      console.error('Failed to register:', error);
-      return {success: false, reason: 'unknown_error'};
+      const message: AuthServerRegisterResponse["message"] = this.getErrorMessageIfPossible(error) ?? 'unknown_error';
+      return {success: false, reason: message};
     }
+  }
+
+  private getErrorMessageIfPossible(error: Error | unknown): AuthServerRegisterResponse["message"] | undefined {
+    if (error instanceof AxiosError) {
+      return error.response?.data?.message ?? undefined;
+    }
+    return undefined;
   }
 
 }

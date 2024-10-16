@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 import {Container} from 'react-bootstrap';
-import LoginPageViewModel from "./LoginPageViewModel.tsx";
-import LoginForm from "@src/components/LoginForm.tsx";
+import LoginPageViewModel from "./LoginPageViewModel";
+import LoginForm from "@src/components/LoginForm";
 
 const LoginPage = ({viewModel}: { viewModel: LoginPageViewModel }) => {
   const [clientIdValid, setClientIdValid] = useState<boolean | null>(null);

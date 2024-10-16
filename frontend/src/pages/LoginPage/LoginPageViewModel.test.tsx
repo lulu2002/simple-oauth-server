@@ -1,8 +1,8 @@
-import LoginPageViewModel from "./LoginPageViewModel.tsx";
-import QueryParamsMock from "@src/application/query/QueryParamsMock.ts";
-import AuthCheckResult from "@src/domain/AuthCheckResult.ts";
-import {AuthLoginResult} from "@src/domain/AuthLogin.tsx";
-import AuthProxyInMemory from "@src/application/auth/AuthProxyInMemory.ts";
+import LoginPageViewModel from "./LoginPageViewModel";
+import QueryParamsMock from "@src/application/query/QueryParamsMock";
+import AuthCheckResult from "@src/domain/AuthCheckResult";
+import {AuthLoginResult} from "@src/domain/AuthLogin";
+import AuthProxyInMemory from "@src/application/auth/AuthProxyInMemory";
 
 
 describe('LoginPageViewModel', () => {

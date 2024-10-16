@@ -1,4 +1,4 @@
-import QueryParams from "./QueryParams.ts";
+import QueryParams from "./QueryParams";
 
 export default class QueryParamsMock implements QueryParams {
 

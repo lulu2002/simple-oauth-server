@@ -12,14 +12,16 @@
     }
   ],
   "include": [
-    "src",
+    "src/**/*.ts",
+    "src/**/*.tsx",
     "./jest.setup.ts"
   ],
   "compilerOptions": {
     "jsx": "react-jsx",
-    "allowImportingTsExtensions": true,
     "esModuleInterop": true,
+    "allowImportingTsExtensions": false,
     "baseUrl": "./",
+    "moduleResolution": "Node",
     "paths": {
       "@src/*": [
         "src/*"

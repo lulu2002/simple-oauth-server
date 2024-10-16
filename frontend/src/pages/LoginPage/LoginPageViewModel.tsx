@@ -1,7 +1,7 @@
-import QueryParams from "@src/application/query/QueryParams.ts";
-import AuthCheckResult from "@src/domain/AuthCheckResult.ts";
-import {AuthProxy} from "@src/application/auth/AuthProxy.ts";
-import {AuthLoginResult} from "@src/domain/AuthLogin.tsx";
+import QueryParams from "@src/application/query/QueryParams";
+import AuthCheckResult from "@src/domain/AuthCheckResult";
+import {AuthProxy} from "@src/application/auth/AuthProxy";
+import {AuthLoginResult} from "@src/domain/AuthLogin";
 
 export default class LoginPageViewModel {
 

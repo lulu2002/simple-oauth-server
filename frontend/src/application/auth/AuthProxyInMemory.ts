@@ -1,7 +1,7 @@
-import AuthCheckResult from "@src/domain/AuthCheckResult.ts";
-import {AuthLoginContext, AuthLoginResult} from "@src/domain/AuthLogin.tsx";
-import {RegisterAccountContext, RegisterAccountResult} from "@src/domain/RegisterAccount.ts";
-import {AuthProxy} from "@src/application/auth/AuthProxy.ts";
+import AuthCheckResult from "@src/domain/AuthCheckResult";
+import {AuthLoginContext, AuthLoginResult} from "@src/domain/AuthLogin";
+import {RegisterAccountContext, RegisterAccountResult} from "@src/domain/RegisterAccount";
+import {AuthProxy} from "@src/application/auth/AuthProxy";
 
 export default class AuthProxyInMemory implements AuthProxy {
 
@@ -35,7 +35,7 @@ export default class AuthProxyInMemory implements AuthProxy {
 
   async registerAccount(ctx: RegisterAccountContext): Promise<RegisterAccountResult> {
     if (this.accounts.has(ctx.email))
-      return {success: false, reason: 'account already exists'};
+      return {success: false, reason: 'account_already_exists'};
 
     this.accounts.set(ctx.email, {email: ctx.email, password: ctx.password});
     return {success: true, reason: 'ok'};
