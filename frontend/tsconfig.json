@@ -11,6 +11,10 @@
       "path": "../shared"
     }
   ],
+  "include": [
+    "src",
+    "./jest.setup.ts"
+  ],
   "compilerOptions": {
     "jsx": "react-jsx",
     "allowImportingTsExtensions": true,

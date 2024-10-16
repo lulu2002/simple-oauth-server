@@ -14,7 +14,7 @@ module.exports = {
     "package.json",
     "package-lock.json",
     "reportWebVitals.ts",
-    "setupTests.ts",
+    "jest.setup.ts",
     "index.tsx"
   ],
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],

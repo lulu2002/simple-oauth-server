@@ -1,23 +1,21 @@
-import LoginPageViewModel, {AuthLoginResult} from "./LoginPageViewModel.tsx";
-import {AxiosInstance} from "axios";
-import AuthClientCheckResult from "./AuthClientCheckResult.ts";
-import QueryParamsMock from "@src/application/QueryParamsMock.ts";
-import {AuthServerValidateResponse} from "@shared/auth-server-validate.ts";
-import {AuthServerLoginRequest, AuthServerLoginResponse} from "@shared/auth-server-login.ts";
-import {AxiosClientFixed} from "@src/application/AxiosClientFixed.ts";
+import LoginPageViewModel from "./LoginPageViewModel.tsx";
 import {mock, MockProxy} from "jest-mock-extended";
+import QueryParamsMock from "@src/application/query/QueryParamsMock.ts";
+import AuthCheckResult from "@src/domain/AuthCheckResult.ts";
+import {AuthProxy} from "@src/application/auth/AuthProxy.ts";
+import {AuthLoginResult} from "@src/domain/AuthLogin.tsx";
 
 
 describe('LoginPageViewModel', () => {
 
   let queryParams: QueryParamsMock;
   let viewModel: LoginPageViewModel;
-  let axioInstance: MockProxy<AxiosInstance>;
+  let authProxy: MockProxy<AuthProxy>;
 
   beforeEach(() => {
     queryParams = new QueryParamsMock();
-    axioInstance = mock<AxiosInstance>();
-    viewModel = new LoginPageViewModel(queryParams, new AxiosClientFixed(axioInstance));
+    authProxy = mock<AuthProxy>();
+    viewModel = new LoginPageViewModel(queryParams, authProxy);
   });
 
   afterEach(() => {
@@ -32,14 +30,14 @@ describe('LoginPageViewModel', () => {
     });
 
     it('should failed if client id is not valid', async () => {
-      mockAxiosResponse({code: 400, message: "client with id not found", valid: false})
+      mockAuthCheckResult({success: false, reason: "client with id not found"})
       provideValidClient()
 
       await assertCheckFailed("client with id not found");
     });
 
     it('should success if all valid', async () => {
-      mockAxiosResponse({code: 200, message: "ok", valid: true})
+      mockAuthCheckResult({success: true, reason: "ok"})
       provideValidClient()
 
       await assertCheckResult(true, "ok");
@@ -53,17 +51,17 @@ describe('LoginPageViewModel', () => {
     async function assertCheckResult(bool: boolean, message: string, block: () => void = () => {
     }) {
       block();
-      const result: AuthClientCheckResult = {reason: message, success: bool}
+      const result: AuthCheckResult = {reason: message, success: bool}
       expect(await viewModel.checkClientValidAuthRequest()).toStrictEqual(result);
     }
 
-    function mockAxiosResponse(data: AuthServerValidateResponse) {
-      axioInstance.get.mockImplementation((url, cfg) => {
-        if (url === '/api/authorize' && cfg?.params?.client_id === 'id' && cfg?.params?.redirect_uri === 'uri') {
-          return Promise.resolve({data: data});
+    function mockAuthCheckResult(data: AuthCheckResult) {
+      authProxy.isAuthenticated.mockImplementation((clientId, redirectUri) => {
+        if (clientId === 'id' && redirectUri === 'uri') {
+          return Promise.resolve(data);
         } else {
           const unmockedAxios = jest.requireActual('axios');
-          return unmockedAxios.post(url);
+          return unmockedAxios.get('/api/authorize');
         }
       });
     }
@@ -89,16 +87,13 @@ describe('LoginPageViewModel', () => {
       await assertLoginResult({success: true, message: 'ok', token: 'token'});
     });
 
-    function mockLoginResponse(response: AuthServerLoginResponse) {
-      axioInstance.post.mockImplementation((url, body) => {
-        const data = body as AuthServerLoginRequest;
-        if (url === '/api/login' && data.username === 'user' && data.password === 'pass' && data.client_id === 'id' && data.redirect_uri === 'uri') {
-          return Promise.resolve({data: response});
-        } else {
-          const unmockedAxios = jest.requireActual('axios');
-          return unmockedAxios.post(url);
-        }
-      })
+    function mockLoginResponse(response: AuthLoginResult) {
+      authProxy.login.mockImplementation((request) => {
+        if (request.username === 'user' && request.password === 'pass' && request.clientId === 'id' && request.redirectUri === 'uri')
+          return Promise.resolve(response);
+
+        return Promise.resolve({success: false, message: 'invalid request', token: ''});
+      });
     }
 
     async function assertLoginResult(result: AuthLoginResult, block: () => void = () => {

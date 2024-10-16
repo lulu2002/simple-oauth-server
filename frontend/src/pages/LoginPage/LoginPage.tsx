@@ -25,19 +25,24 @@ const LoginPage = ({viewModel}: { viewModel: LoginPageViewModel }) => {
   }
 
   return (
-    <LoginForm
-      isError={loginError}
-      invalidAccount={loginError}
-      registerLink="/register"
-      keepQuery={true}
-      onSubmit={(username, password) => {
-        viewModel.login(username, password).then((result) => {
-          if (result.success)
-            viewModel.closeWithCode(result.token);
-          else
-            setLoginError(true);
-        });
-      }}/>
+    <>
+      <Container>
+        <h1 className="text-center my-5">Auth 登入</h1>
+        <LoginForm
+          isError={loginError}
+          invalidAccount={loginError}
+          registerLink="/register"
+          keepQuery={true}
+          onSubmit={(username, password) => {
+            viewModel.login(username, password).then((result) => {
+              if (result.success)
+                viewModel.closeWithCode(result.token);
+              else
+                setLoginError(true);
+            });
+          }}/>
+      </Container>
+    </>
   );
 };
 

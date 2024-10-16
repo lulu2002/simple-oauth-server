@@ -22,7 +22,6 @@ const LoginForm = (props: LoginFormProps) => {
   return (
     <>
       <Container>
-        <h1 className="text-center my-5">Auth 登入</h1>
         <Row className="justify-content-center">
           <Col md={4}>
             <Form onSubmit={(e) => {

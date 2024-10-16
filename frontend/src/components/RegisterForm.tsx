@@ -3,18 +3,18 @@ import {Link} from "react-router-dom";
 import {useState} from "react";
 
 
-interface LoginFormProps {
+interface RegisterFormProps {
   onSubmit: (email: string, password: string) => void;
   isError: boolean;
-  invalidAccount: boolean;
-  registerLink: string;
+  loginLink: string;
   keepQuery: boolean;
 }
 
-const LoginForm = (props: LoginFormProps) => {
+const RegisterForm = (props: RegisterFormProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [submitTried, setSubmitTried] = useState(false);
 
   const search = props.keepQuery ? window.location.search : '';
 
@@ -23,7 +23,16 @@ const LoginForm = (props: LoginFormProps) => {
       <Container>
         <Row className="justify-content-center">
           <Col md={4}>
-            <Form>
+            <Form onSubmit={(e) => {
+              e.preventDefault();
+              setSubmitTried(true);
+
+              if (password !== confirmPassword) {
+                return;
+              }
+
+              props.onSubmit(email, password);
+            }}>
               <Form.Group className="mb-3" controlId="email">
                 <Form.Label>電子郵件</Form.Label>
                 <Form.Control
@@ -54,8 +63,13 @@ const LoginForm = (props: LoginFormProps) => {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
-                  isInvalid={confirmPassword !== password}
+                  isInvalid={confirmPassword !== password && submitTried}
                 />
+                {confirmPassword !== password && submitTried && (
+                  <Form.Control.Feedback type="invalid">
+                    密碼不一致
+                  </Form.Control.Feedback>
+                )}
               </Form.Group>
 
               <div className="d-grid gap-2">
@@ -65,7 +79,7 @@ const LoginForm = (props: LoginFormProps) => {
               </div>
 
               <div className="text-center mt-3">
-                <Link to={{pathname: props.registerLink, search: search}}>
+                <Link to={{pathname: props.loginLink, search: search}}>
                   <Button variant="link">已有帳號？登入</Button>
                 </Link>
               </div>
@@ -78,4 +92,4 @@ const LoginForm = (props: LoginFormProps) => {
 
 }
 
-export default LoginForm;
+export default RegisterForm;
