@@ -1,5 +1,6 @@
 import {AuthServerValidateResponse} from "@shared/auth-server-validate.ts";
 import {AuthServerLoginRequest, AuthServerLoginResponse} from "@shared/auth-server-login.ts";
+import {AuthServerRegisterRequest, AuthServerRegisterResponse} from "@shared/auth-server-register.ts";
 import {AxiosInstance} from "axios";
 import {AuthProxy} from "@src/application/auth/AuthProxy.ts";
 import AuthCheckResult from "@src/domain/AuthCheckResult.ts";
@@ -35,16 +36,26 @@ export default class AuthProxyAxios implements AuthProxy {
         redirect_uri: ctx.redirectUri
       };
       const data: AuthServerLoginResponse = (await this.axios.post<AuthServerLoginResponse>('/api/login', body)).data;
-      return {success: data.success, message: data.message, token: data.token};
+      return {success: data.success, message: data.message, code: data.token};
     } catch (error) {
       console.error('Failed to login:', error);
-      return {success: false, message: 'failed to login', token: ''};
+      return {success: false, message: 'failed to login', code: ''};
     }
 
   }
 
   async registerAccount(request: RegisterAccountContext): Promise<RegisterAccountResult> {
-    return Promise.resolve(undefined);
+    try {
+      const body: AuthServerRegisterRequest = {
+        username: request.email,
+        password: request.password,
+      };
+      const data: AuthServerRegisterResponse = (await this.axios.post<AuthServerRegisterResponse>('/api/register', body)).data;
+      return {success: data.success, reason: data.message};
+    } catch (error) {
+      console.error('Failed to register:', error);
+      return {success: false, reason: 'unknown_error'};
+    }
   }
 
 }

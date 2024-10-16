@@ -1,9 +1,13 @@
-import AuthCheckResult from "@src/domain/AuthCheckResult.ts";
+import {AuthProxy} from "@src/application/auth/AuthProxy.ts";
+import {RegisterAccountResult} from "@src/domain/RegisterAccount.ts";
 
 export default class RegisterPageViewModel {
 
-  async register(username: string, password: string): Promise<AuthCheckResult> {
+  constructor(private authProxy: AuthProxy) {
+  }
 
+  async register(username: string, password: string): Promise<RegisterAccountResult> {
+    return this.authProxy.registerAccount({email: username, password: password});
   }
 
 }

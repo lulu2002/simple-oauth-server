@@ -1,7 +1,7 @@
 export interface AuthLoginResult {
   success: boolean;
   message: string;
-  token: string;
+  code: string;
 }
 
 export interface AuthLoginContext {

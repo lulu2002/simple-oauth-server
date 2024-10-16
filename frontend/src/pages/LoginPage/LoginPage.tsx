@@ -36,7 +36,7 @@ const LoginPage = ({viewModel}: { viewModel: LoginPageViewModel }) => {
           onSubmit={(username, password) => {
             viewModel.login(username, password).then((result) => {
               if (result.success)
-                viewModel.closeWithCode(result.token);
+                viewModel.closeWithCode(result.message);
               else
                 setLoginError(true);
             });

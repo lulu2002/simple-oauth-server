@@ -19,7 +19,7 @@ function App() {
         <div className="App">
           <Routes>
             <Route path="/login" element={<LoginPage viewModel={new LoginPageViewModel(queryParams, proxy)}/>}/>
-            <Route path="/register" element={<RegisterPage viewModel={new RegisterPageViewModel()}/>}/>
+            <Route path="/register" element={<RegisterPage viewModel={new RegisterPageViewModel(proxy)}/>}/>
           </Routes>
         </div>
       </Router>

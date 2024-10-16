@@ -9,3 +9,4 @@ export interface AuthProxy {
 
   isAuthenticated(clientId: string, redirectUri: string): Promise<AuthCheckResult>;
 }
+

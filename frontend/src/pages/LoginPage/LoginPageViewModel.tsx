@@ -29,10 +29,10 @@ export default class LoginPageViewModel {
     const redirectUri = this.queryParams.get('redirect_uri');
 
     if (!clientId)
-      return {success: false, message: 'client_id is not present', token: ''};
+      return {success: false, message: 'client_id is not present', code: ''};
 
     if (!redirectUri)
-      return {success: false, message: 'redirect_uri is not present', token: ''};
+      return {success: false, message: 'redirect_uri is not present', code: ''};
 
     return this.client.login({username, password, clientId, redirectUri});
   }

@@ -1,12 +1,9 @@
-export interface AuthServerLoginRequest {
+export interface AuthServerRegisterRequest {
   username: string,
   password: string,
-  client_id: string,
-  redirect_uri: string
 }
 
-export interface AuthServerLoginResponse {
+export interface AuthServerRegisterResponse {
   success: boolean;
-  message: string;
-  token: string;
+  message: "ok" | "account_already_exists" | "invalid_email" | "invalid_password" | "unknown_error",
 }

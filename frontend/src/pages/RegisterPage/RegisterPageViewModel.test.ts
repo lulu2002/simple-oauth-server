@@ -1,30 +1,36 @@
 import RegisterPageViewModel from "@src/pages/RegisterPage/RegisterPageViewModel.ts";
-import {AuthProxy} from "@src/application/auth/AuthProxy.ts";
-import {mock, MockProxy} from "jest-mock-extended";
+import AuthProxyInMemory from "@src/application/auth/AuthProxyInMemory.ts";
+import {RegisterAccountResult} from "@src/domain/RegisterAccount.ts";
 
 
 describe('RegisterPageViewModel', () => {
   let viewModel: RegisterPageViewModel;
-  let authProxy: MockProxy<AuthProxy>;
+  let authProxy: AuthProxyInMemory;
 
   beforeEach(() => {
-    authProxy = mock<AuthProxy>();
+    authProxy = new AuthProxyInMemory();
     viewModel = new RegisterPageViewModel(authProxy);
   });
 
   describe('register', () => {
-    it('should call authClient.register with the correct parameters', async () => {
-      const username = 'username';
-      const password = 'password';
-      const expectedRequest: AuthServerRegisterRequest = {username, password};
-      const expectedResponse: AuthServerRegisterResponse = {success: true};
 
-      const registerSpy = jest.spyOn(authProxy, 'register').mockResolvedValue(expectedResponse);
+    it('should fail if account already exists', async () => {
+      await authProxy.registerAccount({email: 'username', password: 'password'});
+      const result = await viewModel.register('username', 'password');
 
-      const result = await viewModel.register(username, password);
-
-      expect(result.success).toBe(true);
-      expect(registerSpy).toHaveBeenCalledWith(expectedRequest);
+      assertResult(result, {success: false, reason: 'account_already_exists'});
     });
+
+    it('should just forward', async () => {
+      const result = await viewModel.register('username', 'password');
+
+      assertResult(result, {success: true, reason: 'ok'});
+    });
+
+    function assertResult(result: RegisterAccountResult, expected: RegisterAccountResult) {
+      expect(result).toStrictEqual(expected);
+    }
+
   });
+
 });

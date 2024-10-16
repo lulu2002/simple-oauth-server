@@ -5,7 +5,10 @@ import {useState} from "react";
 
 interface RegisterFormProps {
   onSubmit: (email: string, password: string) => void;
-  isError: boolean;
+  isAccountExists: boolean;
+  invalidEmail: boolean;
+  invalidPassword: boolean;
+  unknownError: boolean;
   loginLink: string;
   keepQuery: boolean;
 }
@@ -42,6 +45,16 @@ const RegisterForm = (props: RegisterFormProps) => {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                 />
+                {props.isAccountExists && (
+                  <Form.Text className="text-danger">
+                    此帳號已存在
+                  </Form.Text>
+                )}
+                {props.invalidEmail && (
+                  <Form.Text className="text-danger">
+                    無效的電子郵件
+                  </Form.Text>
+                )}
               </Form.Group>
 
               <Form.Group className="mb-3" controlId="password">
@@ -53,6 +66,11 @@ const RegisterForm = (props: RegisterFormProps) => {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
+                {props.invalidPassword && (
+                  <Form.Text className="text-danger">
+                    無效的密碼
+                  </Form.Text>
+                )}
               </Form.Group>
 
               <Form.Group className="mb-3" controlId="confirmPassword">
@@ -76,6 +94,12 @@ const RegisterForm = (props: RegisterFormProps) => {
                 <Button type="submit" variant="primary">
                   註冊
                 </Button>
+
+                {props.unknownError && (
+                  <Form.Text className="text-danger">
+                    未知錯誤
+                  </Form.Text>
+                )}
               </div>
 
               <div className="text-center mt-3">

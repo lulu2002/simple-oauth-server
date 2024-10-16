@@ -1,6 +1,6 @@
 export interface RegisterAccountResult {
   success: boolean,
-  reason: string
+  reason: "ok" | "account_already_exists" | "invalid_email" | "invalid_password" | "unknown_error",
 }
 
 export interface RegisterAccountContext {
