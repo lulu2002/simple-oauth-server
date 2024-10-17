@@ -15,42 +15,51 @@ import AuthCodeCacheInMemory from "@test-fixture/application/auth/auth-code-cach
 import CurrentTimeStampImpl from "@src/application/util/current-time-stamp-impl";
 import AuthController from "@src/adapters/auth/auth-controller";
 
-const fastifyInstance = fastify();
-fastifyInstance.register(fastifyFormbody);
-fastifyInstance.register(fastifyCookie);
-fastifyInstance.register(fastifyCors, {origin: true});
-fastifyInstance.register(fastifyJwt, {secret: "secret"});
 
-const authRepo = new OauthClientRepositoryInMemory();
-const userRepo = new UserRepositoryInMemory();
-const currentTimestamp = new CurrentTimeStampImpl();
-const codeCache = new AuthCodeCacheInMemory(currentTimestamp);
-const passwordHashing = new PasswordHashingImpl(10);
-const codeGenerator = new RandomCodeGeneratorImpl();
-const registerUser = new RegisterUser(userRepo, passwordHashing);
-const loginUser = new LoginUser(
-  authRepo,
-  userRepo,
-  passwordHashing,
-  codeGenerator,
-  codeCache,
-  currentTimestamp,
-  1000 * 60 * 5
-)
-const userController = new UserController(registerUser, loginUser);
-const authController = new AuthController(authRepo, codeCache, passwordHashing, userRepo);
+async function main() {
+  const fastifyInstance = fastify();
+  fastifyInstance.register(fastifyFormbody);
+  fastifyInstance.register(fastifyCookie);
+  fastifyInstance.register(fastifyCors, {origin: true});
+  fastifyInstance.register(fastifyJwt, {secret: "secret"});
 
-userController.registerRoutes(fastifyInstance);
-authController.registerRoutes(fastifyInstance);
+  const authRepo = new OauthClientRepositoryInMemory();
+  const userRepo = new UserRepositoryInMemory();
+  const currentTimestamp = new CurrentTimeStampImpl();
+  const codeCache = new AuthCodeCacheInMemory(currentTimestamp);
+  const passwordHashing = new PasswordHashingImpl(10);
+  const codeGenerator = new RandomCodeGeneratorImpl();
+  const registerUser = new RegisterUser(userRepo, passwordHashing);
+  const loginUser = new LoginUser(
+    authRepo,
+    userRepo,
+    passwordHashing,
+    codeGenerator,
+    codeCache,
+    currentTimestamp,
+    1000 * 60 * 5
+  )
+  const userController = new UserController(registerUser, loginUser);
+  const authController = new AuthController(authRepo, codeCache, passwordHashing, userRepo);
 
-authRepo.add({
-  allowOrigins: [], id: "test_client", name: "test client", redirectUris: ["http://localhost:5173/callback"], secret: "test_secret"
-})
+  userController.registerRoutes(fastifyInstance);
+  authController.registerRoutes(fastifyInstance);
 
-fastifyInstance.listen({port: 8080}, (err, address) => {
-  if (err) {
-    console.error(err)
-    process.exit(1)
-  }
-  console.log(`Server listening at ${address}`)
-})
+  authRepo.add({
+    allowOrigins: [],
+    id: "test_client",
+    name: "test client",
+    redirectUris: ["http://localhost:5173/callback"],
+    secret: await passwordHashing.hash("test_secret")
+  })
+
+  fastifyInstance.listen({port: 8080}, (err, address) => {
+    if (err) {
+      console.error(err)
+      process.exit(1)
+    }
+    console.log(`Server listening at ${address}`)
+  })
+}
+
+main();
