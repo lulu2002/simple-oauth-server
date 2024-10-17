@@ -3,8 +3,8 @@ import OauthClientRepository from "@src/application/auth/oauth-client-repository
 import {AuthServerValidateResponse} from "@shared/auth-server-validate";
 import {OauthExchangeRequest, OauthExchangeResponse} from "@shared/oauth-exchange";
 import AuthCodeCache from "@src/application/auth/auth-code-cache";
-import PasswordHashing from "@src/application/hashing/PasswordHashing";
 import UserRepository from "@src/application/user/user-repository";
+import PasswordHashing from "@src/application/hashing/password-hashing";
 
 export default class AuthController {
 
@@ -20,9 +20,9 @@ export default class AuthController {
     app.get<{
       Querystring: { client_id: string, redirect_uri: string },
       Headers: { host: string }
-    }>('/api/authorize', (request, reply) => {
+    }>('/api/authorize', async (request, reply) => {
       const {client_id, redirect_uri} = request.query;
-      const client = this.clientRepo.findById(client_id) ?? null;
+      const client = await this.clientRepo.findById(client_id) ?? null;
 
       if (!client)
         return this.replyValidateResponse(reply, {code: 400, valid: false, message: 'client with id not found'});
@@ -46,7 +46,7 @@ export default class AuthController {
       if (entry.clientId !== client_id)
         return this.replyTokenInvalidCredentials(reply);
 
-      const client = this.clientRepo.findById(client_id) ?? null;
+      const client = await this.clientRepo.findById(client_id) ?? null;
 
       if (!client)
         return this.replyTokenInvalidCredentials(reply);

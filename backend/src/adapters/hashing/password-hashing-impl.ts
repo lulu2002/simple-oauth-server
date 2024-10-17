@@ -1,5 +1,5 @@
-import PasswordHashing from "@src/application/hashing/PasswordHashing";
 import bcrypt from "bcrypt";
+import PasswordHashing from "@src/application/hashing/password-hashing";
 
 export default class PasswordHashingImpl implements PasswordHashing {
 

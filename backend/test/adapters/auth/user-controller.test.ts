@@ -1,19 +1,18 @@
 import fastify, {FastifyInstance} from "fastify";
 import UserController from "@src/adapters/auth/user-controller";
 import {AuthServerRegisterRequest, AuthServerRegisterResponse} from "@shared/auth-server-register";
-import {AuthServerValidateResponse} from "@shared/auth-server-validate";
 import {AuthServerLoginRequest, AuthServerLoginResponse} from "@shared/auth-server-login";
 import OauthClientRepositoryInMemory from "@test-fixture/application/auth/oauth-client-repository-in-memory";
 import UserRepositoryInMemory from "@test-fixture/application/user/user-repository-in-memory";
 import RegisterUser from "@src/application/user/register-user";
 import OauthClient from "@src/domain/oauth-client";
-import PasswordHashingImpl from "@src/adapters/hashing/PasswordHashingImpl";
-import PasswordHashing from "@src/application/hashing/PasswordHashing";
 import RandomCodeGenerator from "@src/application/util/random-code-generator";
 import RandomCodeGeneratorFixed from "@test-fixture/application/util/random-code-generator-fixed";
 import AuthCodeCacheInMemory from "@test-fixture/application/auth/auth-code-cache-in-memory";
 import CurrentTimeStampMock from "@test-fixture/application/util/current-time-stamp-mock";
 import LoginUser from "@src/application/user/login-user";
+import PasswordHashing from "@src/application/hashing/password-hashing";
+import PasswordHashingImpl from "@src/adapters/hashing/password-hashing-impl";
 
 
 describe('UserController', () => {

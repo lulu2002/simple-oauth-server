@@ -1,9 +1,9 @@
 import UserRepository from "@src/application/user/user-repository";
-import PasswordHashing from "@src/application/hashing/PasswordHashing";
 import RandomCodeGenerator from "@src/application/util/random-code-generator";
 import AuthCodeCache from "@src/application/auth/auth-code-cache";
 import CurrentTimeStamp from "@src/application/util/current-time-stamp";
 import OauthClientRepository from "@src/application/auth/oauth-client-repository";
+import PasswordHashing from "@src/application/hashing/password-hashing";
 
 export default class LoginUser {
 
@@ -20,7 +20,7 @@ export default class LoginUser {
 
   async login(request: LoginUserRequest): Promise<LoginUserResult> {
     const {client_id, redirect_uri, password, username} = request;
-    const client = this.clientRepo.findById(client_id) ?? null;
+    const client = await this.clientRepo.findById(client_id) ?? null;
 
     if (!client)
       return {type: 'invalid_client'};

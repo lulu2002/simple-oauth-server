@@ -7,8 +7,8 @@ import AuthController from "@src/adapters/auth/auth-controller";
 import {OauthExchangeRequest, OauthExchangeResponse} from "@shared/oauth-exchange";
 import AuthCodeCacheInMemory from "@test-fixture/application/auth/auth-code-cache-in-memory";
 import CurrentTimeStampMock from "@test-fixture/application/util/current-time-stamp-mock";
-import PasswordHashingImpl from "@src/adapters/hashing/PasswordHashingImpl";
 import UserRepositoryInMemory from "@test-fixture/application/user/user-repository-in-memory";
+import PasswordHashingImpl from "@src/adapters/hashing/password-hashing-impl";
 
 describe('AuthController', () => {
 

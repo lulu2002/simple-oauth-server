@@ -10,6 +10,8 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "strict": true,
     "moduleResolution": "bundler",
     "outDir": "./build",

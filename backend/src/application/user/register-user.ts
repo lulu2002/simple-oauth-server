@@ -1,7 +1,7 @@
 import UserRepository from "@src/application/user/user-repository";
 import User from "@src/domain/user";
 import {AuthServerRegisterResponse} from "@shared/auth-server-register";
-import PasswordHashing from "@src/application/hashing/PasswordHashing";
+import PasswordHashing from "@src/application/hashing/password-hashing";
 
 export default class RegisterUser {
 
