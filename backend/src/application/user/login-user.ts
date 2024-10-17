@@ -35,7 +35,7 @@ export default class LoginUser {
       return {type: 'invalid_credentials'};
 
     const code = this.codeGenerator.generate(10);
-    await this.codeCache.saveToken(client.id, user.id, code, this.currentTimeStamp.get() + this.expiresIn);
+    await this.codeCache.saveCode(client.id, user.id, code, this.currentTimeStamp.get() + this.expiresIn);
     return {type: 'ok', token: code};
   }
 

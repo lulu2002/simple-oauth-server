@@ -1,4 +1,4 @@
-import AuthCodeCache from "@src/application/auth/auth-code-cache";
+import AuthCodeCache, {AuthEntry} from "@src/application/auth/auth-code-cache";
 import CurrentTimeStamp from "@src/application/util/current-time-stamp";
 
 export default class AuthCodeCacheInMemory implements AuthCodeCache {
@@ -7,7 +7,19 @@ export default class AuthCodeCacheInMemory implements AuthCodeCache {
   constructor(private currentTimeStamp: CurrentTimeStamp) {
   }
 
-  saveToken(clientId: string, userId: string, token: string, expiresAt: number): Promise<void> {
+  getAuthEntry(code: string): Promise<AuthEntry | null> {
+    for (const [clientId, userCache] of this.cache) {
+      for (const [userId, {token, expiresAt}] of userCache) {
+        if (token === code) {
+          return Promise.resolve({clientId, userId, code: token, expiresAt});
+        }
+      }
+    }
+    return Promise.resolve(null);
+  }
+
+
+  saveCode(clientId: string, userId: string, token: string, expiresAt: number): Promise<void> {
     if (!this.cache.has(clientId)) {
       this.cache.set(clientId, new Map());
     }
@@ -16,12 +28,12 @@ export default class AuthCodeCacheInMemory implements AuthCodeCache {
     return Promise.resolve();
   }
 
-  getToken(clientId: string, userId: string): Promise<string | null> {
+  getCode(clientId: string, userId: string): Promise<string | null> {
     const token = this.cache.get(clientId)?.get(userId)?.token ?? null;
     return Promise.resolve(token);
   }
 
-  removeToken(clientId: string, userId: string): Promise<void> {
+  removeCode(clientId: string, userId: string): Promise<void> {
     const userCache = this.cache.get(clientId);
     if (userCache) {
       userCache.delete(userId);

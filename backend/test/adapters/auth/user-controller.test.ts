@@ -197,7 +197,7 @@ describe('UserController', () => {
         });
 
       expect(codeCache.getExpiresAt(client.id, user.id)).toBe(2001);
-      expect(await codeCache.getToken(client.id, user.id)).toBe("cccccccccc");
+      expect(await codeCache.getCode(client.id, user.id)).toBe("cccccccccc");
     });
 
     async function assertLogin(request: AuthServerLoginRequest, code: number, response: AuthServerLoginResponse) {

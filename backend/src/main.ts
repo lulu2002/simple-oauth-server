@@ -2,6 +2,7 @@ import fastify from 'fastify';
 import fastifyCookie from '@fastify/cookie';
 import fastifyCors from '@fastify/cors';
 import fastifyFormbody from '@fastify/formbody';
+import fastifyJwt from "@fastify/jwt";
 import UserController from "@src/adapters/auth/user-controller";
 import OauthClientRepositoryInMemory from "@test-fixture/application/auth/oauth-client-repository-in-memory";
 import * as process from "node:process";
@@ -18,6 +19,7 @@ const fastifyInstance = fastify();
 fastifyInstance.register(fastifyFormbody);
 fastifyInstance.register(fastifyCookie);
 fastifyInstance.register(fastifyCors, {origin: true});
+fastifyInstance.register(fastifyJwt, {secret: "secret"});
 
 const authRepo = new OauthClientRepositoryInMemory();
 const userRepo = new UserRepositoryInMemory();
@@ -36,13 +38,13 @@ const loginUser = new LoginUser(
   1000 * 60 * 5
 )
 const userController = new UserController(registerUser, loginUser);
-const authController = new AuthController(authRepo);
+const authController = new AuthController(authRepo, codeCache, passwordHashing, userRepo);
 
 userController.registerRoutes(fastifyInstance);
 authController.registerRoutes(fastifyInstance);
 
 authRepo.add({
-  allowOrigins: [], id: "test_client", name: "test client", redirectUris: ["http://localhost:5173/callback"], secret: ""
+  allowOrigins: [], id: "test_client", name: "test client", redirectUris: ["http://localhost:5173/callback"], secret: "test_secret"
 })
 
 fastifyInstance.listen({port: 8080}, (err, address) => {
