@@ -27,6 +27,9 @@ async function main() {
   fastifyInstance.register(fastifyCors, {origin: true});
   fastifyInstance.register(fastifyJwt, {secret: getEnv().JWT_SECRET!});
 
+
+
+
   const dataSource = new DataSource({
     type: 'sqlite',
     database: '../database.sqlite',
