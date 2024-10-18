@@ -6,10 +6,17 @@
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
-    "build": "tsc -p tsconfig.json",
+    "build": "rimraf dist && tsc",
+    "ts.check": "tsc --project tsconfig.json",
+    "add-build": "git add dist",
     "start:prod": "node -r ./tsconfig-paths-bootstrap.js dist/src/main.js",
     "start:local": "nodemon --exec node -r ts-node/register --env-file=.env.local ./src/main.ts"
   },
+  "pre-commit": [
+    "ts.check",
+    "build",
+    "add-build"
+  ],
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -23,7 +30,9 @@
     "dotenv": "^16.4.5",
     "fastify": "^5.0.0",
     "pg": "^8.13.0",
+    "pre-commit": "^1.2.2",
     "reflect-metadata": "^0.2.2",
+    "rimraf": "^6.0.1",
     "sqlite3": "^5.1.7",
     "temp-dir": "^3.0.0",
     "tsconfig-paths": "^4.2.0",
