@@ -5,7 +5,7 @@ import fastifyCors from '@fastify/cors';
 import fastifyFormbody from '@fastify/formbody';
 import fastifyJwt from "@fastify/jwt";
 import UserController from "@src/adapters/auth/user-controller";
-import * as process from "node:process";
+import process from "node:process";
 import RegisterUser from "@src/application/user/register-user";
 import LoginUser from "@src/application/user/login-user";
 import RandomCodeGeneratorImpl from "@src/application/util/random-code-generator-impl";
@@ -18,18 +18,20 @@ import {UserRepositoryTypeOrm} from "@src/adapters/user/user-repository-type-orm
 import {AuthEntryEntity} from "@src/adapters/auth/auth-code-cache-type-orm";
 import PasswordHashingImpl from "@src/adapters/hashing/password-hashing-impl";
 import OauthClientRepositoryTypeOrm, {OauthClientEntity} from "@src/adapters/auth/oauth-client-repository-type-orm";
-
+import dotenv from 'dotenv';
 
 async function main() {
+  dotenv.config({path: '../.env'});
+
   const fastifyInstance = fastify();
   fastifyInstance.register(fastifyFormbody);
   fastifyInstance.register(fastifyCookie);
   fastifyInstance.register(fastifyCors, {origin: true});
-  fastifyInstance.register(fastifyJwt, {secret: "secret"});
+  fastifyInstance.register(fastifyJwt, {secret: process.env.JWT_SECRET!});
 
   const dataSource = new DataSource({
     type: 'sqlite',
-    database: 'database.sqlite',
+    database: '../database.sqlite',
     entities: [UserEntity, AuthEntryEntity, OauthClientEntity],
     synchronize: true,
     logging: true,

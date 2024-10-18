@@ -38,10 +38,10 @@ export class OauthClientEntity {
   secret: string;
 
   @Column("simple-array")
-  redirectUris: string[];  // 存儲一個簡單的字串數組
+  redirectUris: string[];
 
   @Column("simple-array")
-  allowOrigins: string[];  // 存儲允許的來源字串數組
+  allowOrigins: string[];
 
   constructor(
     id: string,
