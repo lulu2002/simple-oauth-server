@@ -7,16 +7,9 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "build": "rimraf dist && tsc",
-    "ts.check": "tsc --project tsconfig.json",
-    "add-build": "git add dist",
     "start:prod": "node -r ./tsconfig-paths-bootstrap.js dist/src/main.js",
     "start:local": "nodemon --exec node -r ts-node/register --env-file=.env.local ./src/main.ts"
   },
-  "pre-commit": [
-    "ts.check",
-    "build",
-    "add-build"
-  ],
   "keywords": [],
   "author": "",
   "license": "ISC",
