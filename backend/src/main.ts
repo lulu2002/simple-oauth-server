@@ -20,15 +20,16 @@ import {AuthEntryEntity} from "@src/adapters/auth/auth-code-cache-type-orm";
 import PasswordHashingImpl from "@src/adapters/hashing/password-hashing-impl";
 import OauthClientRepositoryTypeOrm, {OauthClientEntity} from "@src/adapters/auth/oauth-client-repository-type-orm";
 
+
+async function another() {
+}
+
 async function main() {
   const fastifyInstance = fastify();
   fastifyInstance.register(fastifyFormbody);
   fastifyInstance.register(fastifyCookie);
   fastifyInstance.register(fastifyCors, {origin: true});
   fastifyInstance.register(fastifyJwt, {secret: getEnv().JWT_SECRET!});
-
-
-
 
   const dataSource = new DataSource({
     type: 'sqlite',
