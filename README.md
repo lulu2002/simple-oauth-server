@@ -113,3 +113,9 @@
 - **框架**：React.js
 - **建構工具**：Vite
 - **測試框架**：Jest
+
+---
+
+## 心路歷程和開發選擇
+
+關於開發方法和策略，統一寫在了 Shop 專案的 README.md 中，請參考 [專案連結](https://github.com/lulu2002/jkopay-assignment-oauth-shop-app?tab=readme-ov-file#%E9%96%8B%E7%99%BC%E6%96%B9%E6%B3%95)
