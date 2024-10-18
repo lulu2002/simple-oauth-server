@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import 'tsconfig-paths/register';
 import fastify from 'fastify';
 import fastifyCookie from '@fastify/cookie';
 import fastifyCors from '@fastify/cors';
@@ -18,17 +19,13 @@ import {UserRepositoryTypeOrm} from "@src/adapters/user/user-repository-type-orm
 import {AuthEntryEntity} from "@src/adapters/auth/auth-code-cache-type-orm";
 import PasswordHashingImpl from "@src/adapters/hashing/password-hashing-impl";
 import OauthClientRepositoryTypeOrm, {OauthClientEntity} from "@src/adapters/auth/oauth-client-repository-type-orm";
-import dotenv from 'dotenv';
 
 async function main() {
-  dotenv.config({path: '../.env'});
-  const env = process.env;
-
   const fastifyInstance = fastify();
   fastifyInstance.register(fastifyFormbody);
   fastifyInstance.register(fastifyCookie);
   fastifyInstance.register(fastifyCors, {origin: true});
-  fastifyInstance.register(fastifyJwt, {secret: env.JWT_SECRET!});
+  fastifyInstance.register(fastifyJwt, {secret: getEnv().JWT_SECRET!});
 
   const dataSource = new DataSource({
     type: 'sqlite',
@@ -63,20 +60,24 @@ async function main() {
   authController.registerRoutes(fastifyInstance);
 
   await authRepo.create({
-    id: env.PREDEFINE_CLIENT_ID!,
-    name: env.PREDEFINE_CLIENT_NAME!,
-    redirectUris: [env.PREDEFINE_CLIENT_REDIRECT_URI!],
-    secret: await passwordHashing.hash(env.PREDEFINE_CLIENT_SECRET!),
+    id: getEnv().PREDEFINE_CLIENT_ID!,
+    name: getEnv().PREDEFINE_CLIENT_NAME!,
+    redirectUris: [getEnv().PREDEFINE_CLIENT_REDIRECT_URI!],
+    secret: await passwordHashing.hash(getEnv().PREDEFINE_CLIENT_SECRET!),
     allowOrigins: [],
   });
 
-  fastifyInstance.listen({port: Number(env.PORT!)}, (err, address) => {
+  fastifyInstance.listen({port: Number(getEnv().PORT!)}, (err, address) => {
     if (err) {
       console.error(err)
       process.exit(1)
     }
     console.log(`Server listening at ${address}`)
   })
+}
+
+function getEnv() {
+  return process.env;
 }
 
 main();

@@ -6,15 +6,15 @@
   ],
   "compilerOptions": {
     "target": "ESNext",
-    "module": "commonjs",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "strict": true,
-    "moduleResolution": "bundler",
-    "outDir": "./build",
+    "outDir": "./dist",
     "rootDir": "./",
     "baseUrl": ".",
     "paths": {

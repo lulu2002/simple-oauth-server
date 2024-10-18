@@ -1,4 +1,4 @@
-import PasswordHashing from "@src/application/hashing/PasswordHashing";
+import PasswordHashing from "@src/application/hashing/password-hashing";
 
 export default class PasswordHashingNoHashing implements PasswordHashing {
   hash(password: string): Promise<string> {
