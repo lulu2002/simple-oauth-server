@@ -71,7 +71,7 @@ async function main() {
     allowOrigins: [],
   });
 
-  fastifyInstance.listen({port: Number(getEnv().PORT!)}, (err, address) => {
+  fastifyInstance.listen({host: getEnv().HOST, port: Number(getEnv().PORT!)}, (err, address) => {
     if (err) {
       console.error(err)
       process.exit(1)
